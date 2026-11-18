@@ -85,10 +85,8 @@ public final class UbuntuRootfs {
                     return;
                 }
                 markDeployed();
-                if (!activity.isFinishing() && !activity.isDestroyed()) {
-                    if (!UbuntuRuntime.startIfBare(activity)) {
-                        throw new java.io.IOException("Ubuntu Bare installatiemarkering ontbreekt");
-                    }
+                if (!UbuntuRuntime.startIfBare(activity.getApplicationContext())) {
+                    throw new java.io.IOException("Ubuntu Bare installatiemarkering ontbreekt");
                 }
             } catch (Exception failure) {
                 Log.e("UbuntuRootfs", "Linux-start mislukt", failure);

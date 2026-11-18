@@ -10,13 +10,23 @@ public class UbuntuBootstrapTest {
         q1.f scene = new q1.f();
         if (UbuntuRootfs.ensureInstalled(activity, scene)) { throw new AssertionError("First click did not schedule installation"); }
         for (int i = 0; i < 20; i++) { UbuntuRootfs.ensureInstalled(activity, scene); }
-        if (!UbuntuRuntime.started.await(60, TimeUnit.SECONDS)) { throw new AssertionError("First click never resumed Linux"); }
+        activity.destroyed = true;
+        Runnable resume = activity.uiTasks.poll(60, TimeUnit.SECONDS);
+        if (resume == null) { throw new AssertionError("Installation never queued its completion callback"); }
+        if (UbuntuRuntime.starts != 0 || !UbuntuImage.ready(activity.files)) {
+            throw new AssertionError("Installation was not ready before its queued completion callback");
+        }
+        resume.run();
+        if (UbuntuRuntime.starts != 1) { throw new AssertionError("Destroyed Activity prevented installed Ubuntu from starting"); }
+        if (UbuntuRuntime.lastContext != activity.getApplicationContext() || UbuntuRuntime.lastContext == activity) {
+            throw new AssertionError("Runtime did not start with the application context");
+        }
         if (UbuntuRuntime.starts != 1 || activity.posted != 1 || !UbuntuImage.ready(activity.files)) {
             throw new AssertionError("Installation did not resume exactly once");
         }
         if (!UbuntuRootfs.ensureInstalled(activity, scene) || UbuntuRuntime.starts != 1) {
             throw new AssertionError("Second click scheduled another installation");
         }
-        System.out.println("Ubuntu bootstrap integration passed: first-click async installation, one direct runtime-service start, warm start");
+        System.out.println("Ubuntu bootstrap integration passed: first-click async installation, destroyed Activity, one application-context runtime start, retained readiness, warm start");
     }
 }
