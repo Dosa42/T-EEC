@@ -1,0 +1,65 @@
+name: Build T-EEC Prover Toolchains
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: teec-prover-toolchains-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  rocq:
+    runs-on: ubuntu-24.04-arm
+    container:
+      image: ubuntu:22.04
+      options: --user 0:0
+    timeout-minutes: 360
+    defaults:
+      run:
+        shell: bash
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      OPAMROOT: /root/.opam
+      OPAMROOTISOK: '1'
+      OPAMJOBS: '2'
+      OPAMCOLOR: never
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Install Ubuntu 22.04 build dependencies
+        run: |
+          apt-get update
+          apt-get install --no-install-recommends -y \
+            build-essential ca-certificates curl file git libgmp-dev m4 \
+            opam patch pkg-config python3 rsync unzip xz-utils zstd
+
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Build, verify, and package Rocq
+        run: bash .github/scripts/build-prover-toolchains.sh
+
+      - name: Upload verified Rocq toolchain
+        uses: actions/upload-artifact@v7
+        with:
+          name: teec-rocq-9.3.0-ubuntu-22.04-arm64-${{ github.run_number }}
+          path: dist/prover-toolchains/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+          include-hidden-files: true
+
+      - name: Retain build diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: teec-rocq-build-failure-arm64-${{ github.run_number }}
+          path: |
+            dist/prover-toolchains/build.log
+            /root/.opam/log/
+          if-no-files-found: warn
+          retention-days: 7
+          include-hidden-files: true
