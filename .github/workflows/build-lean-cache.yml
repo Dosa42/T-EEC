@@ -1,0 +1,64 @@
+name: Build T-EEC Lean Cache Helper
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: teec-lean-cache-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  lean-cache:
+    runs-on: ubuntu-24.04-arm
+    container:
+      image: ubuntu:22.04
+      options: --user 0:0
+    timeout-minutes: 180
+    defaults:
+      run:
+        shell: bash
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      ELAN_HOME: /root/.elan
+      LEAN_NUM_THREADS: '2'
+      MATHLIB_NO_CACHE_ON_UPDATE: '1'
+      MATHLIB_CACHE_PARALLEL_MAX: '4'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Install Ubuntu 22.04 build dependencies
+        run: |
+          apt-get update
+          apt-get install --no-install-recommends -y \
+            binutils build-essential ca-certificates curl file git \
+            libgmp-dev python3 python3-jsonschema xz-utils zstd
+
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Build, verify, and package the Lean cache helper
+        run: bash .github/scripts/build-lean-cache.sh
+
+      - name: Upload verified Lean cache helper
+        uses: actions/upload-artifact@v7
+        with:
+          name: teec-lean-cache-4.36.0-arm64-${{ github.run_number }}
+          path: dist/lean-cache/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+          include-hidden-files: true
+
+      - name: Retain build diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: teec-lean-cache-build-failure-arm64-${{ github.run_number }}
+          path: |
+            dist/lean-cache/build.log
+            dist/lean-cache/verification/
+          if-no-files-found: warn
+          retention-days: 7
