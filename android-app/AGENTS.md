@@ -2,7 +2,7 @@
 
 Objective: Preserve Samet's terminal purpose and implement only the current authorized stage.
 
-- Current stage: the owner supplied Dosa42/T-EEC and authorized publishing this source and building/signing the APK through its independent GitHub Actions workflow. Compilation and packaging are authorized. Installation, app launch, copying live data and changing the future foundation architecture are not part of this build instruction.
+- Current stage: the owner authorized installing T-EEC and provisioning its fresh Ubuntu headlessly: update/upgrade, Rocq 9.3.0, Lean, standard libraries, Python/pip, Git, wget, Node.js, OCaml and rustup. Repair installation blockers and use the independent GitHub Actions workflow for APK rebuilds. Do not copy another app’s live data or change the future foundation architecture as part of provisioning.
 - The naming contract is [identity.json](../identity.json). Use package `io.teec`, Java namespace `teec.shell.term_shell`, launcher class `io.teec.Launch` and the matching JNI/export names. Update both producer and consumer of every renamed identifier.
 - Ubuntu uses the bundled base image. Do not copy another live environment, model store, database or provider login as an incidental step.
 - Read [runtime-policy.yaml](server-java/runtime-policy.yaml) before changing access or process behavior. Keep HTTP/MCP `0.0.0.0:8866`, RAG `0.0.0.0:8867`, SSH `0.0.0.0:8122` and the matching launcher URL. Internal probes and the legacy asset listener remain distinct.

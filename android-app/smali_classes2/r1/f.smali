@@ -1720,7 +1720,8 @@
     :cond_1c
     iget-object v4, v2, Lq1/f;->p:Landroidx/fragment/app/h;
 
-    invoke-static {v4, v0}, Lteec/shell/term_shell/runtime/SemanticSettings;->request(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/String;
+    iget-object v5, v2, Lq1/f;->b:Lteec/shell/term_shell/LaunchActivity;
+    invoke-static {v5, v0}, Lteec/shell/term_shell/runtime/SemanticSettings;->request(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/String;
     move-result-object v5
     if-eqz v5, :semantic_settings_continue
     invoke-virtual {v8, v5}, Lteec/shell/GeckoView/MyGeckoView;->f(Ljava/lang/String;)V
