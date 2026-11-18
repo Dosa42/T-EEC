@@ -2277,15 +2277,7 @@
     .line 157
     :cond_4
     :goto_0
-    invoke-virtual {v0}, Lq1/x;->e()Lteec/shell/giap/GIAP;
 
-    .line 158
-    .line 159
-    .line 160
-    move-result-object v0
-
-    .line 161
-    invoke-virtual {v0}, Lteec/shell/giap/GIAP;->resume()V
 
     .line 162
     .line 163

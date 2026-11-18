@@ -1115,37 +1115,9 @@
     .line 536
     .line 537
     .line 538
-    new-instance v1, Ljava/lang/Thread;
+    iget-object v1, v0, Lq1/x;->d:Lq1/f;
 
-    .line 539
-    .line 540
-    iget-object v2, v0, Lq1/x;->c:Ljava/lang/ThreadGroup;
-
-    .line 541
-    .line 542
-    new-instance v3, Lq1/j;
-
-    .line 543
-    .line 544
-    const/16 v4, 0x8
-
-    .line 545
-    .line 546
-    invoke-direct {v3, v0, v4}, Lq1/j;-><init>(Lq1/x;I)V
-
-    .line 547
-    .line 548
-    .line 549
-    const-string v4, "nomThread1"
-
-    .line 550
-    .line 551
-    invoke-direct {v1, v2, v3, v4}, Ljava/lang/Thread;-><init>(Ljava/lang/ThreadGroup;Ljava/lang/Runnable;Ljava/lang/String;)V
-
-    .line 552
-    .line 553
-    .line 554
-    invoke-virtual {v1}, Ljava/lang/Thread;->start()V
+    invoke-static {v1}, Lteec/shell/term_shell/Applications/Linux/LinuxApplication;->getInstance(Lq1/f;)Lr1/c;
 
     .line 555
     .line 556
