@@ -87,19 +87,32 @@ jobs:
 
       - name: Test host runtime and frontend behavior
         run: |
-          python3 .github/scripts/test-pty.py
-          python3 .github/scripts/test-terminal.py
-          python3 .github/scripts/test-external-frontend.py
-          python3 .github/scripts/test-files.py
-          python3 .github/scripts/test-engine.py
-          python3 .github/scripts/test-mcp.py
-          python3 .github/scripts/test-teec-host.py
-          python3 .github/scripts/test-cliproxy-profiles.py
-          python3 .github/scripts/test-rag-preflight.py
-          python3 .github/scripts/test-rag-ingestion-proxy.py
-          node .github/scripts/frontend-runtime-tests.cjs
-          python3 .github/scripts/test-ubuntu.py
-          python3 .github/scripts/test-ssh.py
+          failed=0
+          run_check() {
+            printf '::group::%s\n' "$*"
+            if "$@"; then
+              printf 'PASS: %s\n' "$*"
+            else
+              status=$?
+              printf '::error::Check failed (exit %s): %s\n' "$status" "$*"
+              failed=1
+            fi
+            printf '::endgroup::\n'
+          }
+          run_check python3 .github/scripts/test-pty.py
+          run_check python3 .github/scripts/test-terminal.py
+          run_check python3 .github/scripts/test-external-frontend.py
+          run_check python3 .github/scripts/test-files.py
+          run_check python3 .github/scripts/test-engine.py
+          run_check python3 .github/scripts/test-mcp.py
+          run_check python3 .github/scripts/test-teec-host.py
+          run_check python3 .github/scripts/test-cliproxy-profiles.py
+          run_check python3 .github/scripts/test-rag-preflight.py
+          run_check python3 .github/scripts/test-rag-ingestion-proxy.py
+          run_check node .github/scripts/frontend-runtime-tests.cjs
+          run_check python3 .github/scripts/test-ubuntu.py
+          run_check python3 .github/scripts/test-ssh.py
+          exit "$failed"
 
       - name: Verify rebuilt payloads
         run: |

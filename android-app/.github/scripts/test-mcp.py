@@ -153,7 +153,7 @@ with tempfile.TemporaryDirectory(prefix='teec-mcp-test-') as temporary:
         require(status == 202 and not data, 'client_response_202_empty')
         require(call('engine_order', {'id': 'unknown'})['isError'], 'missing_order_is_tool_error')
         literal = "literal ; $(touch INJECTED) ' ✓ + & %\nline"
-        identifier = 'exact / ✓ + & %'
+        identifier = 'exact / ✓ + & % %2F ?query=value#fragment'
         argv = [shell, '-c', 'printf "%s\\n" "$PWD" "$1" "$2"; printf stderr >&2', 'mcp-test', literal, '']
         accepted = submit(identifier, argv)
         require(not accepted['isError'] and accepted['structuredContent']['argv'] == argv, 'accepted_exact_argv')

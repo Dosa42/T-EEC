@@ -12,7 +12,8 @@ public final class MachineEngineTestMain {
             if (Files.exists(Paths.get("/system/bin/linker64"))) nativeCommand[0] = System.getenv("PREFIX") + "/bin/env";
             return new ProcessBuilder(nativeCommand).start();
         });
-        TerminalServer server = new TerminalServer(0, path -> new byte[0], () -> new TerminalServer.State("", null, ""), null, engine::request);
+        TerminalServer server = new TerminalServer(0, path -> new byte[0], () -> new TerminalServer.State("", null, ""), null,
+                (method, path, body) -> engine.request(method, java.net.URI.create(path).getPath(), body));
         Runtime.getRuntime().addShutdownHook(new Thread(() -> { server.close(); engine.close(); }));
         System.out.println("PORT=" + server.port());
         System.out.flush();

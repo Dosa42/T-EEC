@@ -109,7 +109,7 @@ public final class McpEndpoint {
                 path = "/control/summary";
             } else if (name.equals("engine_order")) {
                 keys(args, "id");
-                path = "/control/orders/" + string(args, "id");
+                path = "/control/orders/" + encode(string(args, "id")).replace("+", "%20");
             } else {
                 keys(args, "id", "source", "cwd", "argv");
                 String id = string(args, "id");
