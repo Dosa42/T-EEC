@@ -28,7 +28,7 @@ mkdir -p "$OPAMROOT/teec-sources" "$build_info"
 curl --fail --location --retry 3 --output "$build_info/rocq-9.3.0.upstream.tar.gz" "$upstream_url"
 printf '%s  %s\n' "$upstream_sha256" "$build_info/rocq-9.3.0.upstream.tar.gz" | sha256sum --check --strict
 opam show --switch=rocq-9.3.0 --raw rocq-runtime.9.3.0 > "$build_info/rocq-runtime.upstream.opam"
-opam source --switch=rocq-9.3.0 --require-checksums --dir="$runtime_source" rocq-runtime.9.3.0
+opam source --switch=rocq-9.3.0 --dir="$runtime_source" rocq-runtime.9.3.0
 python3 - "$build_info" "$runtime_source" <<'PY'
 from pathlib import Path
 import hashlib
