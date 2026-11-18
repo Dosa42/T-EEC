@@ -214,7 +214,7 @@ record = {
     'executed_checks': ['cache --help', 'cache get- Mathlib.Algebra.Group.Basic', 'leantar --jobs 1 -x --delete-corrupted -j -', 'lean -j1 LeanCacheSmoke.lean'],
 }
 schema = {
-    '$schema': 'https://json-schema.org/draft/2020-12/schema',
+    '$schema': 'http://json-schema.org/draft-07/schema#',
     'type': 'object',
     'properties': {key: {'const': value} for key, value in record.items() if key not in ('dependencies', 'bundled_runtime_libraries')},
     'required': list(record),
@@ -225,8 +225,8 @@ schema['properties']['dependencies'] = {
     'items': {'type': 'object', 'properties': {'name': {'type': 'string', 'minLength': 1}, 'commit': {'type': 'string', 'pattern': '^[0-9a-f]{40}$'}}, 'required': ['name', 'commit'], 'additionalProperties': False},
 }
 schema['properties']['bundled_runtime_libraries'] = {'type': 'array', 'uniqueItems': True, 'items': {'type': 'string', 'pattern': '^[^/]+$'}}
-jsonschema.Draft202012Validator.check_schema(schema)
-jsonschema.Draft202012Validator(schema).validate(record)
+jsonschema.Draft7Validator.check_schema(schema)
+jsonschema.Draft7Validator(schema).validate(record)
 (stage / 'metadata/manifest.schema.json').write_text(json.dumps(schema, indent=2) + '\n')
 (stage / 'metadata/manifest.json').write_text(json.dumps(record, indent=2) + '\n')
 for path in evidence.iterdir():
