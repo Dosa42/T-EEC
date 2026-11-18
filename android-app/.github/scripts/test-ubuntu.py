@@ -23,7 +23,22 @@ with tempfile.TemporaryDirectory(prefix='teec-ubuntu-') as temporary:
         (files / 'common/bin/busybox').symlink_to(native / 'lib_bin_busybox.so')
     classes = work / 'classes'
     classes.mkdir()
-    sources = [root / 'server-java/teec/shell/term_shell/runtime' / name for name in ['UbuntuImage.java', 'UbuntuRootfs.java']] + sorted((root / 'tests/java').rglob('*.java'))
+    test_sources = [
+        'UbuntuImageTest.java',
+        'UbuntuBootstrapTest.java',
+        'android/app/Activity.java',
+        'android/content/Context.java',
+        'android/content/pm/ApplicationInfo.java',
+        'android/content/res/AssetManager.java',
+        'android/util/Log.java',
+        'android/widget/Toast.java',
+        'o1/y.java',
+        'q1/f.java',
+        'r1/c.java',
+        'teec/shell/term_shell/Applications/LauncherApplication.java',
+        'teec/shell/term_shell/runtime/UbuntuRuntime.java',
+    ]
+    sources = [root / 'server-java/teec/shell/term_shell/runtime' / name for name in ['UbuntuImage.java', 'UbuntuRootfs.java']] + [root / 'tests/java' / name for name in test_sources]
     subprocess.run(['javac', '--release', '8', '-Xlint:-options', '-d', classes, *sources], check=True)
     archive = root / 'assets/linux/ubuntu-base-22.04.5-base-arm64.tar.gz'
     subprocess.run(['java', '-cp', classes, 'UbuntuImageTest', work / 'image-files', native, archive], check=True)
