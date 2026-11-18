@@ -1,0 +1,33 @@
+{
+  "schema": "teec.identity/1",
+  "application": {
+    "id": "io.teec",
+    "label": "T-EEC",
+    "version_name": "0.1.0-teec",
+    "version_code": 1
+  },
+  "java": {
+    "base_package": "teec.shell",
+    "runtime_package": "teec.shell.term_shell.runtime",
+    "launcher_receiver": "io.teec.Launch"
+  },
+  "native": {
+    "pty_library": "teec_pty",
+    "display_library": "EecX",
+    "jni_prefix": "Java_teec_shell_term_1shell"
+  },
+  "paths": {
+    "service_source": "android-app/t-eec",
+    "service_assets": "android-app/assets/t-eec",
+    "guest_bootstrap": "/t-eec",
+    "guest_runtime": "/opt/t-eec",
+    "guest_frontend": "/opt/t-eec/frontend"
+  },
+  "history": {
+    "root": "../teec-history",
+    "verification_rules": "../teec-history/20261118-branding/branding-checks.json"
+  },
+  "verification": {
+    "current_source": "tools/current-source-checks.json"
+  }
+}

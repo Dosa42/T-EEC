@@ -1,0 +1,2 @@
+#!/t-eec/busybox_static sh
+touch /t-eec/SystemReady

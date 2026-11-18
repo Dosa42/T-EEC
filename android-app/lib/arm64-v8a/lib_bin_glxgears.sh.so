@@ -1,0 +1,5 @@
+#!/support/common/busybox_static sh
+
+export LD_LIBRARY_PATH=/host-rootfs/system/lib64
+#/host-rootfs/system/bin/linker64 /data/data/io.teec/files/common/bin/ls /data/data/io.teec/files/common/bin
+/host-rootfs/system/bin/linker64 /data/data/io.teec/files/common/bin/glxgears

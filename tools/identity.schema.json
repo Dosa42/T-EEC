@@ -1,0 +1,157 @@
+{
+  "type": "object",
+  "required": [
+    "schema",
+    "application",
+    "java",
+    "native",
+    "paths",
+    "history",
+    "verification"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "teec.identity/1"
+    },
+    "application": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "version_name",
+        "version_code"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version_code": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "java": {
+      "type": "object",
+      "required": [
+        "base_package",
+        "runtime_package",
+        "launcher_receiver"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "base_package": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtime_package": {
+          "type": "string",
+          "minLength": 1
+        },
+        "launcher_receiver": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "native": {
+      "type": "object",
+      "required": [
+        "pty_library",
+        "display_library",
+        "jni_prefix"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "pty_library": {
+          "type": "string",
+          "minLength": 1
+        },
+        "display_library": {
+          "type": "string",
+          "minLength": 1
+        },
+        "jni_prefix": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "required": [
+        "service_source",
+        "service_assets",
+        "guest_bootstrap",
+        "guest_runtime",
+        "guest_frontend"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "service_source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "service_assets": {
+          "type": "string",
+          "minLength": 1
+        },
+        "guest_bootstrap": {
+          "type": "string",
+          "minLength": 1
+        },
+        "guest_runtime": {
+          "type": "string",
+          "minLength": 1
+        },
+        "guest_frontend": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "history": {
+      "type": "object",
+      "required": [
+        "root",
+        "verification_rules"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification_rules": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "required": [
+        "current_source"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "current_source": {
+          "const": "tools/current-source-checks.json"
+        }
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:teec:identity:1"
+}

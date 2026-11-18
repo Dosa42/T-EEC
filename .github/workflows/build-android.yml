@@ -1,0 +1,158 @@
+name: Build T-EEC Android
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - android-app/**
+      - identity.json
+      - tools/verify-branding.py
+      - tools/identity.schema.json
+      - .github/workflows/build-android.yml
+      - .github/scripts/**
+
+permissions:
+  contents: read
+
+concurrency:
+  group: teec-android-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+        working-directory: android-app
+    env:
+      APKTOOL_VERSION: '3.0.3'
+      APKTOOL_SHA256: dbf930b076c6b9be08d57c449cacefc3bdd6b71ebd59b3066fc0e1f5b14f9423
+      DEX_TOOLS_SHA256: ee7c45eb3c1d2474a6145d8d447e651a736a22d9664b6d3d3be5a5a817dda23a
+      ANDROID_BUILD_TOOLS: '35.0.0'
+      ANDROID_NDK_VERSION: '27.2.12479018'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Require persistent signing configuration
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_PASSWORD ANDROID_KEY_ALIAS; do
+            if [ -z "${!name}" ]; then
+              printf '::error::Required repository secret is missing: %s\n' "$name"
+              exit 1
+            fi
+          done
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install build and host-test tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y busybox unzip build-essential python3-venv
+          python3 -m venv "$RUNNER_TEMP/runtime-tests"
+          "$RUNNER_TEMP/runtime-tests/bin/pip" install websockets==15.0.1 jsonschema==4.23.0
+          printf '%s\n' "$RUNNER_TEMP/runtime-tests/bin" >> "$GITHUB_PATH"
+          mkdir -p "$RUNNER_TEMP/apktool" "$RUNNER_TEMP/dex-tools"
+          curl --fail --location --retry 3 --output "$RUNNER_TEMP/apktool/apktool.jar" "https://github.com/iBotPeaches/Apktool/releases/download/v${APKTOOL_VERSION}/apktool_${APKTOOL_VERSION}.jar"
+          printf '%s  %s\n' "$APKTOOL_SHA256" "$RUNNER_TEMP/apktool/apktool.jar" | sha256sum --check --strict
+          curl --fail --location --retry 3 --output "$RUNNER_TEMP/dex-tools.zip" 'https://github.com/pxb1988/dex2jar/releases/download/v2.4/dex-tools-v2.4.zip'
+          printf '%s  %s\n' "$DEX_TOOLS_SHA256" "$RUNNER_TEMP/dex-tools.zip" | sha256sum --check --strict
+          unzip -q "$RUNNER_TEMP/dex-tools.zip" -d "$RUNNER_TEMP/dex-tools"
+          chmod +x "$RUNNER_TEMP/dex-tools/dex-tools-v2.4/"*.sh
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "build-tools;${ANDROID_BUILD_TOOLS}" 'platforms;android-35' "ndk;${ANDROID_NDK_VERSION}"
+          printf '%s\n' "$ANDROID_HOME/build-tools/$ANDROID_BUILD_TOOLS" >> "$GITHUB_PATH"
+          printf 'D2J_BAKSMALI=%s\n' "$RUNNER_TEMP/dex-tools/dex-tools-v2.4/d2j-baksmali.sh" >> "$GITHUB_ENV"
+          printf 'ANDROID_NDK_HOME=%s\n' "$ANDROID_HOME/ndk/$ANDROID_NDK_VERSION" >> "$GITHUB_ENV"
+
+      - name: Check source identity and bundled Ubuntu
+        run: |
+          python3 ../tools/verify-branding.py --portable
+          python3 .github/scripts/vendor-ubuntu.py
+
+      - name: Rebuild native PTY and Java runtime
+        run: |
+          python3 tools/build-pty.py
+          python3 tools/build-server-java.py
+
+      - name: Test host runtime and frontend behavior
+        run: |
+          python3 .github/scripts/test-pty.py
+          python3 .github/scripts/test-terminal.py
+          python3 .github/scripts/test-external-frontend.py
+          python3 .github/scripts/test-files.py
+          python3 .github/scripts/test-engine.py
+          python3 .github/scripts/test-mcp.py
+          python3 .github/scripts/test-teec-host.py
+          python3 .github/scripts/test-cliproxy-profiles.py
+          python3 .github/scripts/test-rag-preflight.py
+          python3 .github/scripts/test-rag-ingestion-proxy.py
+          node .github/scripts/frontend-runtime-tests.cjs
+          python3 .github/scripts/test-ubuntu.py
+          python3 .github/scripts/test-ssh.py
+
+      - name: Verify rebuilt payloads
+        run: |
+          python3 .github/scripts/verify-runtime.py
+          python3 .github/scripts/verify-assets.py
+          python3 .github/scripts/verify-ssh.py
+          python3 .github/scripts/verify-ubuntu.py
+
+      - name: Build and verify T-EEC APK
+        run: |
+          mkdir -p dist
+          java -jar "$RUNNER_TEMP/apktool/apktool.jar" build . --force --output dist/teec-unsigned.apk
+          python3 .github/scripts/verify-runtime.py dist/teec-unsigned.apk
+          python3 .github/scripts/verify-assets.py dist/teec-unsigned.apk
+          python3 .github/scripts/verify-ssh.py dist/teec-unsigned.apk
+          python3 .github/scripts/verify-ubuntu.py dist/teec-unsigned.apk
+
+      - name: Align and sign T-EEC APK
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          umask 077
+          mkdir -p "$RUNNER_TEMP/signing"
+          keystore="$RUNNER_TEMP/signing/teec.jks"
+          trap 'rm -f "$keystore"' EXIT
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$keystore"
+          build_tools="$ANDROID_HOME/build-tools/$ANDROID_BUILD_TOOLS"
+          "$build_tools/zipalign" -f -P 16 4 dist/teec-unsigned.apk dist/teec-aligned.apk
+          "$build_tools/apksigner" sign --ks "$keystore" --ks-pass env:ANDROID_KEYSTORE_PASSWORD --ks-key-alias "$ANDROID_KEY_ALIAS" --key-pass env:ANDROID_KEY_PASSWORD --out dist/teec.apk dist/teec-aligned.apk
+          "$build_tools/zipalign" -c -P 16 4 dist/teec.apk
+          "$build_tools/apksigner" verify --verbose --print-certs dist/teec.apk > dist/apk-signature.txt
+          "$build_tools/aapt" dump badging dist/teec.apk > dist/apk-metadata.txt
+          python3 ../.github/scripts/verify-apk-identity.py ../identity.json dist/apk-metadata.txt
+          sha256sum dist/teec.apk | tee dist/teec.apk.sha256
+          git rev-parse HEAD > dist/source-commit.txt
+          printf '### T-EEC Android ARM64\n\n' >> "$GITHUB_STEP_SUMMARY"
+          printf 'Source commit: `%s`\n\n' "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          cat dist/teec.apk.sha256 >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: teec-android-arm64-${{ github.run_number }}
+          path: |
+            android-app/dist/teec.apk
+            android-app/dist/teec.apk.sha256
+            android-app/dist/apk-metadata.txt
+            android-app/dist/apk-signature.txt
+            android-app/dist/source-commit.txt
+            android-app/native/build.json
+            android-app/server-java/build.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30

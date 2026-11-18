@@ -1,0 +1,40 @@
+{
+  "schema": "teec.source-checks/1",
+  "unresolved_owned_classes": [
+    {
+      "class": "teec/shell/term_shell/Applications/Linux/DeployLinuxImage",
+      "classification": "inherited_orphan_installer_branch",
+      "basis": "Reviewed source references predate the identity migration. No class implementation or constructor call exists. The current bare installer uses UbuntuRootfs.ensureInstalled and UbuntuImage.install.",
+      "reviewed_on": "2026-11-18",
+      "runtime_status": "not_verified",
+      "referrers": [
+        {
+          "path": "android-app/smali_classes2/d3/o0.smali",
+          "sha256": "4c391b74789f11c0e470b05add1ffa9b674478b4de59949c3461d8fb1608d7d6",
+          "references": 1
+        },
+        {
+          "path": "android-app/smali_classes2/n1/a.smali",
+          "sha256": "94d3ad965f064efe9bc75edae150cccb32f495eef7e2f6f4412e90ee51f5f8ef",
+          "references": 16
+        },
+        {
+          "path": "android-app/smali_classes2/o0/e.smali",
+          "sha256": "7eabbef14f74c09a16ae92e7e516a3370b9caf6b243818db88c18bc05e441da3",
+          "references": 26
+        },
+        {
+          "path": "android-app/smali_classes2/o0/j.smali",
+          "sha256": "f7ba15e25d0910e289c64b2ec046fa6fedce3e5a729efc63b5084b6f4c71efb5",
+          "references": 3
+        }
+      ],
+      "active_installer": {
+        "entry": "android-app/smali_classes2/teec/shell/term_shell/Applications/Linux/LinuxApplication.smali",
+        "required_call": "Lteec/shell/term_shell/runtime/UbuntuRootfs;->ensureInstalled",
+        "implementation": "android-app/server-java/teec/shell/term_shell/runtime/UbuntuRootfs.java",
+        "required_call_in_implementation": "UbuntuImage.install("
+      }
+    }
+  ]
+}

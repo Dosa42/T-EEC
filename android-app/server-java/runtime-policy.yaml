@@ -1,0 +1,31 @@
+schema: "teec.runtime-owner-policy/1"
+owner: "Samet"
+authority: "explicit_user_instruction"
+override_rule: "A later explicit user instruction may revise these choices; update the policy and affected checks together. Existing conversation authorization remains valid."
+purpose: "Primary Ubuntu backend with headless services, independent terminals and machine execution."
+http_bind_host: "0.0.0.0"
+http_port: 8866
+ssh_bind_host: "0.0.0.0"
+ssh_port: 8122
+launcher_url: "http://0.0.0.0:8866/terminal"
+runtime_process: ":ubuntu"
+stop_with_task: false
+foreground_service_type: "specialUse"
+new_host_allowlist: false
+new_origin_allowlist: false
+new_command_allowlist: false
+new_path_allowlist: false
+new_authentication_gate: false
+arbitrary_execution_deadlines: false
+forced_framework_or_provider_swap: false
+preserve_headless_lifecycle: true
+preserve_existing_sessions: true
+existing_ssh_authentication: "Preserve authorized-key login; this policy does not remove current SSH authentication."
+existing_bounded_operations: "Internal health probes, HTTP framing reads and shutdown cleanup are distinct from command execution deadlines."
+verification_scope: "Concrete source binding, port and launcher expressions plus headless manifest attributes; semantic access, execution and session requirements also require review and affected runtime tests."
+format: "Flat YAML mapping only: snake_case keys, JSON-quoted strings, decimal integers and true/false booleans. No nested YAML, aliases, implicit scalar types or duplicate keys."
+preflight1_default_enabled: true
+preflight1_readiness: "Terminal creation and input require actual semantic RAG readiness; status, diagnostics, SSH, running commands and output remain available."
+preflight1_override: "Only the owner native settings toggle may persistently disable Preflight1 for debugging; no automatic bypass or remotely writable toggle."
+semantic_rag_bind_host: "0.0.0.0"
+semantic_rag_port: 8867

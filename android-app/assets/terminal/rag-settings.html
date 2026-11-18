@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101214">
+<title>RAG ayarları · T-EEC</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/terminal/rag-settings.css">
+<script defer src="/terminal/rag-settings.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#settings">Ayarlara geç</a>
+<header class="page-header">
+<div class="identity"><span class="mark" aria-hidden="true">&gt;_</span><div><span class="product">T-EEC</span><h1>RAG ayarları</h1></div></div>
+<a href="/terminal" class="terminal-link">Terminale dön</a>
+</header>
+<nav class="page-nav" aria-label="Sayfa bölümleri"><a href="#departments-section">Departmanlar</a><a href="#sources-section">Kaynaklar</a><a href="#run-section">Çalıştırma</a></nav>
+<main id="settings">
+<section class="mode-strip" aria-labelledby="mode-heading"><div><h2 id="mode-heading">E5 ile tokenizasyon ve indeksleme</h2><p>Önizleme yalnızca tokenları hazırlar. İçe alma, E5 embedding üretir ve seçili Chroma depolarına kaydeder.</p></div><span class="mode-label">e5_embedding</span></section>
+<div class="status-bar"><p id="service-status" role="status" aria-live="polite">Canlı durum yükleniyor…</p><button id="refresh-status" type="button">Durumu yenile</button></div>
+<p id="config-feedback" class="feedback" role="status" aria-live="polite">Ayarlar yükleniyor…</p>
+<div id="conflict-actions" class="conflict-actions" hidden><p>Sunucudaki ayarlar değişti. Taslağınız korunuyor. Güncel sürüme taşıdıktan sonra kaydetmek, sunucudaki ayarları bu taslakla değiştirir.</p><button id="rebase-draft" type="button">Taslağı güncel sürüme taşı</button><button id="discard-draft" type="button">Taslağı bırak, kayıtlı ayarları yükle</button></div>
+<form id="config-form">
+<fieldset id="config-fields" disabled>
+<section id="departments-section" class="section" aria-labelledby="departments-heading">
+<div class="section-heading"><div><h2 id="departments-heading">Departmanlar</h2><p>Altı ayrı kalıcı Chroma dizini. Hazırlanan kayıt ve vektör sayıları ayrı gösterilir.</p></div><span id="department-count" class="small-label">Yükleniyor</span></div>
+<p class="note">Kurallar ve anahtar ifadeler kayıtlı talimatlardır. Henüz otomatik filtreleme veya yönlendirme yapmazlar.</p>
+<ol id="department-list" class="department-list"><li class="empty">Departman ayarları bekleniyor…</li></ol>
+</section>
+<section class="section" aria-labelledby="tokenizer-heading">
+<div class="section-heading"><h2 id="tokenizer-heading">Tokenizasyon</h2><span class="small-label">İçe almada E5 embedding</span></div>
+<div class="tokenizer-fields"><label for="tokenizer-id">Tokenizer<select id="tokenizer-id"><option value="e5-tokenizer">E5 tokenizer + embedding</option></select></label><label for="chunk-tokens">Parça boyutu · token<input id="chunk-tokens" type="number" min="1" step="1" required inputmode="numeric"></label><label for="overlap-tokens">Örtüşme · token<input id="overlap-tokens" type="number" min="0" step="1" required inputmode="numeric" aria-describedby="overlap-help"></label></div><p id="overlap-help" class="note">Örtüşme, parça boyutundan küçük olmalıdır.</p>
+</section>
+<section id="sources-section" class="section" aria-labelledby="sources-heading"><div class="section-heading"><div><h2 id="sources-heading">Kayıtlı kaynaklar</h2><p>Dosya veya klasör ekleyin. İş için kullanılacak kaynakları işaretleyin.</p></div><span id="source-count" class="small-label">—</span></div><ul id="source-list" class="source-list"><li class="empty">Kaynak ayarları bekleniyor…</li></ul></section>
+</fieldset>
+<div class="save-bar"><p id="draft-status">Kayıtlı ayarlar bekleniyor.</p><button id="reload-config" type="button">Ayarları yeniden yükle</button><button id="save-config" class="primary" type="submit" disabled>Ayarları kaydet</button></div>
+</form>
+<section class="section browser-section" aria-labelledby="browser-heading"><div class="section-heading"><div><h2 id="browser-heading">Kaynak seç</h2><p>Bir dosyayı ekleyin veya klasörü açıp kendisini kaynak olarak seçin.</p></div></div>
+<form id="browser-form" class="browser-form"><label for="browser-side">Dosya sistemi<select id="browser-side"><option value="android">Android</option><option value="ubuntu">Ubuntu</option></select></label><label for="browser-path">Klasör yolu<input id="browser-path" value="/storage/emulated/0/Download" spellcheck="false" autocomplete="off" required></label><button type="submit">Klasörü aç</button></form>
+<div class="browser-tools"><button id="browser-up" type="button" disabled>Üst klasör</button><button id="add-directory" type="button" disabled>Bu klasörü kaynak ekle</button><label class="check-label"><input id="browser-recursive" type="checkbox" checked>Alt klasörleri dahil et</label></div>
+<p id="browser-location" class="path">Henüz klasör açılmadı.</p><p id="browser-status" class="feedback" role="status" aria-live="polite">Android veya Ubuntu üzerinde bir klasör açın.</p><ul id="browser-list" class="browser-list" aria-label="Klasördeki dosyalar ve klasörler"></ul>
+</section>
+<section id="run-section" class="section" aria-labelledby="run-heading"><div class="section-heading"><div><h2 id="run-heading">Önizle ve içe al</h2><p>Seçili kaynaklar, işaretlediğiniz her departmana gönderilir.</p></div></div><fieldset id="destinations"><legend>Bu işin hedef departmanları</legend><div id="destination-list" class="destination-list"><p class="empty">Departman ayarları bekleniyor…</p></div></fieldset><p id="run-summary" class="note">Önce kayıtlı ayarları yükleyin.</p><div class="run-actions"><button id="preview-job" type="button" disabled>Önizle</button><button id="ingest-job" class="primary" type="button" disabled>E5 ile içe al</button></div><p class="note">Önizleme departman kayıtlarını değiştirmez ve embedding üretmez. İçe alma, tokenları ve E5 vektörlerini kaydeder. Diğer modeller bu işlemde çalıştırılmaz.</p><p id="run-feedback" class="feedback" role="status" aria-live="polite"></p></section>
+<section class="section" aria-labelledby="jobs-heading"><div class="section-heading"><h2 id="jobs-heading">İşler ve sonuçlar</h2><span id="active-jobs" class="small-label">—</span></div><ul id="job-list" class="job-list"><li class="empty">İş durumu yükleniyor…</li></ul><article id="job-detail" hidden aria-labelledby="job-title"><h3 id="job-title"></h3><p id="job-identity" class="path"></p><p id="job-state" role="status" aria-live="polite"></p><progress id="job-progress" aria-label="İş devam ediyor" hidden></progress><dl id="job-counts" class="metrics"></dl><p id="job-error" class="feedback" role="alert"></p><div id="job-warnings"></div><details id="job-result"><summary>Kaynaklar, hedefler ve örnekler</summary><pre id="job-result-data" tabindex="0"></pre></details></article></section>
+<details class="diagnostics"><summary>Servis yolları</summary><dl id="service-paths"><dt>Durum</dt><dd>Yükleniyor…</dd></dl></details>
+</main>
+<footer>Hazırlanan kayıtlar, vektör indeksinin dolu olduğu anlamına gelmez.</footer>
+<noscript>RAG ayarları için JavaScript etkin olmalıdır.</noscript>
+</body>
+</html>

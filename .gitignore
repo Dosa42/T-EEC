@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+/build/
+/dist/
+/evidence/
+android-app/build/
+android-app/dist/
+android-app/native/build.json
+android-app/server-java/build.json
+*.jks
+*.keystore
+*.apk

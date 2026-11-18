@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:teec:source-checks:1",
+  "type": "object",
+  "required": [
+    "schema",
+    "unresolved_owned_classes"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "teec.source-checks/1"
+    },
+    "unresolved_owned_classes": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "class",
+          "classification",
+          "basis",
+          "reviewed_on",
+          "runtime_status",
+          "referrers",
+          "active_installer"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "class": {
+            "const": "teec/shell/term_shell/Applications/Linux/DeployLinuxImage"
+          },
+          "classification": {
+            "const": "inherited_orphan_installer_branch"
+          },
+          "basis": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reviewed_on": {
+            "const": "2026-11-18"
+          },
+          "runtime_status": {
+            "const": "not_verified"
+          },
+          "referrers": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "required": [
+                "path",
+                "sha256",
+                "references"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "references": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          },
+          "active_installer": {
+            "type": "object",
+            "required": [
+              "entry",
+              "required_call",
+              "implementation",
+              "required_call_in_implementation"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "entry": {
+                "type": "string",
+                "minLength": 1
+              },
+              "required_call": {
+                "type": "string",
+                "minLength": 1
+              },
+              "implementation": {
+                "type": "string",
+                "minLength": 1
+              },
+              "required_call_in_implementation": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

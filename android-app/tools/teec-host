@@ -1,0 +1,1 @@
+exec python3 /usr/local/lib/teec/host.py "$@"
