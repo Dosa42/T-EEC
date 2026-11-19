@@ -2,6 +2,15 @@ name: Build T-EEC Prover Toolchains
 
 on:
   workflow_dispatch:
+    inputs:
+      variant:
+        type: choice
+        description: Rocq build variant
+        required: true
+        default: standard
+        options:
+          - standard
+          - native-diagnostic
 
 permissions:
   contents: read
@@ -26,6 +35,8 @@ jobs:
       OPAMROOTISOK: '1'
       OPAMJOBS: '2'
       OPAMCOLOR: never
+      TEEC_ROCQ_VARIANT: ${{ inputs.variant }}
+      TEEC_ROCQ_DIAGNOSTICS: ${{ inputs.variant == 'native-diagnostic' && '1' || '0' }}
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - name: Install Ubuntu 22.04 build dependencies
@@ -34,6 +45,10 @@ jobs:
           apt-get install --no-install-recommends -y \
             build-essential ca-certificates curl file git libgmp-dev m4 \
             opam patch pkg-config python3 rsync unzip xz-utils zstd
+
+      - name: Install native diagnostic tools
+        if: inputs.variant == 'native-diagnostic'
+        run: apt-get install --no-install-recommends -y gdb
 
       - uses: actions/checkout@v7
         with:
@@ -45,7 +60,7 @@ jobs:
       - name: Upload verified Rocq toolchain
         uses: actions/upload-artifact@v7
         with:
-          name: teec-rocq-9.3.0-teec-elf1-ubuntu-22.04-arm64-${{ github.run_number }}
+          name: teec-rocq-9.3.0-${{ inputs.variant }}-ubuntu-22.04-arm64-${{ github.run_number }}
           path: dist/prover-toolchains/
           if-no-files-found: error
           compression-level: 0
@@ -59,6 +74,7 @@ jobs:
           name: teec-rocq-build-failure-arm64-${{ github.run_number }}
           path: |
             dist/prover-toolchains/build.log
+            dist/prover-toolchains/diagnostics/
             /root/.opam/log/
           if-no-files-found: warn
           retention-days: 7
