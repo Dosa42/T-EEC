@@ -281,7 +281,7 @@ Example vm_smoke : Nat.add 20 22 = 42.
 Proof. vm_compute. reflexivity. Qed.
 ROCQ
 fi
-cat > "$evidence/LibrariesSmoke.v" <<'ROCQ'
+cat > "$evidence/StdppEquationsSmoke.v" <<'ROCQ'
 From stdpp Require Import base.
 From Equations.Prop Require Import Equations.
 Equations smoke_pred (n : nat) : nat :=
@@ -289,6 +289,8 @@ smoke_pred 0 := 0;
 smoke_pred (S n) := n.
 Example smoke_pred_ok : smoke_pred 3 = 2.
 Proof. reflexivity. Qed.
+ROCQ
+cat > "$evidence/MathCompSmoke.v" <<'ROCQ'
 From mathcomp Require Import ssreflect ssrnat.
 Lemma libraries_smoke (n : nat) : n + 0 = n.
 Proof. exact: addn0. Qed.
@@ -296,10 +298,11 @@ ROCQ
 (
     cd "$evidence"
     rocq compile -q "${computation_flags[@]}" "$computation.v"
-    rocq compile -q LibrariesSmoke.v
-    rocq check "$computation" LibrariesSmoke
+    rocq compile -q StdppEquationsSmoke.v
+    rocq compile -q MathCompSmoke.v
+    rocq check "$computation" StdppEquationsSmoke MathCompSmoke
 ) 2>&1 | tee "$evidence/rocq-proofs.txt"
-[[ -s "$evidence/$computation.vo" && -s "$evidence/LibrariesSmoke.vo" ]]
+[[ -s "$evidence/$computation.vo" && -s "$evidence/StdppEquationsSmoke.vo" && -s "$evidence/MathCompSmoke.vo" ]]
 printf 'Rocq %s computation and library proofs: PASS\n' "$variant"
 
 opam switch export --switch=rocq-9.3.0 --full "$output/opam-switch.export"
@@ -395,12 +398,13 @@ ocamlopt -o "$evidence/ocaml_native" "$evidence/ocaml_smoke.ml"
 (
     cd "$evidence"
     rm -rf -- .coq-native
-    rm -f -- "$computation.vo" LibrariesSmoke.vo
+    rm -f -- "$computation.vo" StdppEquationsSmoke.vo MathCompSmoke.vo
     rocq compile -q "${computation_flags[@]}" "$computation.v"
-    rocq compile -q LibrariesSmoke.v
-    rocq check "$computation" LibrariesSmoke
+    rocq compile -q StdppEquationsSmoke.v
+    rocq compile -q MathCompSmoke.v
+    rocq check "$computation" StdppEquationsSmoke MathCompSmoke
 ) 2>&1 | tee "$evidence/extracted-rocq-proofs.txt"
-[[ -s "$evidence/$computation.vo" && -s "$evidence/LibrariesSmoke.vo" ]]
+[[ -s "$evidence/$computation.vo" && -s "$evidence/StdppEquationsSmoke.vo" && -s "$evidence/MathCompSmoke.vo" ]]
 rm -rf -- "$OPAMROOT.prearchive"
 date -u +%FT%TZ > "$evidence/PASS"
 (
